@@ -62,12 +62,16 @@ def make_signal(
 
     Returns
     -------
-    f : 2D array
-        The generated signal.
     x : 1D array
         The spatial grid.
     t : 1D array
         The temporal grid.
+    f : 2D array
+        The signal as a superposition of f1 and f2.
+    f1 : 2D array
+        The first component of the signal.
+    f2 : 2D array
+        The second component of the signal.
     """
 
     x = np.linspace(-L, L, nx)
@@ -93,4 +97,4 @@ def make_signal(
     if noise:
         f += np.random.normal(0, noise_std, f.shape)
 
-    return f, x, t
+    return x, t, f, f1, f2
