@@ -50,7 +50,7 @@ class SignalGenerator:
             omega_f1slow=0.3,
             omega_f2slow=0.2,
             omega_f1med=1.3,
-            omega_f2med=0.8,
+            omega_f2med=1.0,
             omega_f1fast=5.3,
             omega_f2fast=6.0
             ):
