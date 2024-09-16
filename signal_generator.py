@@ -31,10 +31,12 @@ class SignalGenerator:
         f (ndarray): Combined signal. Computed using make_signal method.
 
     Methods:
-        make_signal(self, which="all"):
+        make_signal(self, which="all", add_noise=True, noise_std=0.25):
             Combines the signal components based on the specified type.
             Args:
                 which (str): Type of signal to generate ("all", "slow", "med", "fast").
+                add_noise (bool): If True, adds Gaussian noise to the signal.
+                noise_std (float): Standard deviation of the Gaussian noise.
             Raises:
                 ValueError: If an unknown signal type is specified.
     """
@@ -95,7 +97,7 @@ class SignalGenerator:
         f = x*x*np.exp(-(x + 1)*(x+1)) * np.cos(omega*t+np.pi/4)
         return f
 
-    def make_signal(self, which="all"):
+    def make_signal(self, which="all", add_noise=True, noise_std=0.25):
         if which == "all":
             self.f = self.f1_slow + self.f2_slow + self.f1_med + self.f2_med + self.f1_fast + self.f2_fast
         elif which == "slow":
@@ -106,3 +108,6 @@ class SignalGenerator:
             self.f = self.f1_fast + self.f2_fast
         else:
             raise ValueError("Unknown signal type")
+
+        if add_noise:
+            self.f += np.random.normal(0, noise_std, self.f.shape)
