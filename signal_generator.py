@@ -8,8 +8,8 @@ class SignalGenerator:
     Attributes:
         nx (int): Number of spatial points. Default is 200.
         nt (int): Number of temporal points. Default is 400.
-        L (float): Spatial domain length. Default is 5.
-        T (float): Temporal domain length. Default is 4.
+        x_length (float): Spatial domain length. Default is 5.
+        t_length (float): Temporal domain length. Default is 4.
         x (ndarray): Spatial points.
         t (ndarray): Temporal points.
         X (ndarray): Meshgrid of spatial points.
@@ -44,8 +44,8 @@ class SignalGenerator:
             self,
             nx=200,
             nt=400,
-            L=5.,
-            T=4.,
+            x_length=5.,
+            t_length=4.,
             omega_f1slow=0.3,
             omega_f2slow=0.2,
             omega_f1med=1.3,
@@ -55,10 +55,10 @@ class SignalGenerator:
             ):
         self.nx = nx
         self.nt = nt
-        self.L = L
-        self.T = T
-        self.x = np.linspace(-L, L, nx)
-        self.t = np.linspace(0, T*np.pi, nt)
+        self.x_length = x_length
+        self.t_length = t_length
+        self.x = np.linspace(-x_length, x_length, nx)
+        self.t = np.linspace(0, t_length*np.pi, nt)
         self.X, self.T = np.meshgrid(self.x, self.t)
         self.omega_f1slow = omega_f1slow
         self.omega_f2slow = omega_f2slow
@@ -74,7 +74,7 @@ class SignalGenerator:
         self.f2_fast = self._f2fast(self.X, self.T, self.omega_f2fast)
 
     def _f1slow(self, x, t, omega):
-        f = np.cos(2*np.pi*x/(2*self.L)) * np.cos(omega*t)
+        f = np.cos(2*np.pi*x/(2*self.x_length)) * np.cos(omega*t)
         return f
 
     def _f2slow(self, x, t, omega):
