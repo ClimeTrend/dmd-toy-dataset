@@ -2,36 +2,47 @@ import numpy as np
 
 
 def f1slow(x, t, L):
-    return np.cos(2*np.pi*x/(2*L)) * np.cos(0.3 * t)
+    omega = 0.3
+    f = np.cos(2*np.pi*x/(2*L)) * np.cos(omega * t)
+    return f, omega
 
 
 def f2slow(x, t):
-    return np.exp(-0.2*x*x) * np.cos(0.2 * t)
+    omega = 0.2
+    f = np.exp(-0.2*x*x) * np.cos(omega * t)
+    return f, omega
 
 
 def f1med(x, t):
-    return 1.0 / np.cosh(0.5*(x + 2)) * np.cos(1.3 * t)
+    omega = 1.3
+    f = 1.0 / np.cosh(0.5*(x + 2)) * np.cos(omega * t)
+    return f, omega
 
 
 def f2med(x, t):
-    return 2.0 / np.cosh(0.2*x) * np.tanh(0.2*x) * np.sin(0.8 * t)
+    omega = 0.8
+    f = 2.0 / np.cosh(0.2*x) * np.tanh(0.2*x) * np.sin(omega * t)
+    return f, omega
 
 
 def f1fast(x, t):
-    return np.exp(-(x - 1)*(x-1)) * np.cos(5.3 * t)
+    omega = 5.3
+    f = np.exp(-(x - 1)*(x-1)) * np.cos(omega * t)
+    return f, omega
 
 
 def f2fast(x, t):
-    return x*x*np.exp(-(x + 1)*(x+1)) * np.cos(6.0 * t+np.pi/4)
+    omega = 6.0
+    f = x*x*np.exp(-(x + 1)*(x+1)) * np.cos(omega * t+np.pi/4)
+    return f, omega
 
 
 def make_signal(
         signals="all", noise=True, noise_std=0.5, nx=200, nt=400, L=5., T=4.
         ):
     """
-    Generate a signal as a superposition of two components.
-    Each component is chosen from a set of three slow, medium, and fast
-    signals. The signal is defined on a 2D grid of size nx x nt.
+    Generate a spatio-temporal signal as a superposition components with different speeds
+    (slow, medium, fast). The signal is defined on a 2D grid of size nx x nt.
     The spatial domain is [-L, L] and the temporal domain is [0, T*pi].
     The signal is corrupted by Gaussian noise with standard deviation noise_std.
 
@@ -62,16 +73,12 @@ def make_signal(
 
     Returns
     -------
+    f: dict
+        Dictionary containing the signal components and the superposition.
     x : 1D array
         The spatial grid.
     t : 1D array
         The temporal grid.
-    f : 2D array
-        The signal as a superposition of f1 and f2.
-    f1 : 2D array
-        The first component of the signal.
-    f2 : 2D array
-        The second component of the signal.
     """
 
     x = np.linspace(-L, L, nx)
@@ -79,22 +86,37 @@ def make_signal(
     X, T = np.meshgrid(x, t)
 
     if signals == "all":
-        f1 = f1slow(X, T, L) + f1med(X, T) + f1fast(X, T)
-        f2 = f2slow(X, T) + f2med(X, T) + f2fast(X, T)
+        f = dict.fromkeys(["f1slow", "f2slow", "f1med", "f2med", "f1fast", "f2fast", "f"])
+        omegas = dict.fromkeys(["f1slow", "f2slow", "f1med", "f2med", "f1fast", "f2fast"])
+        f["f1slow"], omegas["f1slow"] = f1slow(X, T, L)
+        f["f2slow"], omegas["f2slow"] = f2slow(X, T)
+        f["f1med"], omegas["f1med"] = f1med(X, T)
+        f["f2med"], omegas["f2med"] = f2med(X, T)
+        f["f1fast"], omegas["f1fast"] = f1fast(X, T)
+        f["f2fast"], omegas["f2fast"] = f2fast(X, T)
+        f["f"] = f["f1slow"] + f["f2slow"] + f["f1med"] + f["f2med"] + f["f1fast"] + f["f2fast"]
     elif signals == "slow":
-        f1 = f1slow(X, T, L)
-        f2 = f2slow(X, T)
+        f = dict.fromkeys(["f1slow", "f2slow", "f"])
+        omegas = dict.fromkeys(["f1slow", "f2slow"])
+        f["f1slow"], omegas["f1slow"] = f1slow(X, T, L)
+        f["f2slow"], omegas["f2slow"] = f2slow(X, T)
+        f["f"] = f["f1slow"] + f["f2slow"]
     elif signals == "med":
-        f1 = f1med(X, T)
-        f2 = f2med(X, T)
+        f = dict.fromkeys(["f1med", "f2med", "f"])
+        omegas = dict.fromkeys(["f1med", "f2med"])
+        f["f1med"] = f1med(X, T)
+        f["f2med"] = f2med(X, T)
+        f["f"] = f["f1med"] + f["f2med"]
     elif signals == "fast":
-        f1 = f1fast(X, T)
-        f2 = f2fast(X, T)
+        f = dict.fromkeys(["f1fast", "f2fast", "f"])
+        omegas = dict.fromkeys(["f1fast", "f2fast"])
+        f["f1fast"], omegas["f1fast"] = f1fast(X, T)
+        f["f2fast"], omegas["f2fast"] = f2fast(X, T)
+        f["f"] = f["f1fast"] + f["f2fast"]
     else:
         raise ValueError("Unknown signal type")
-    f = f1 + f2
 
     if noise:
-        f += np.random.normal(0, noise_std, f.shape)
+        f["f"] += np.random.normal(0, noise_std, f["f"].shape)
 
-    return x, t, f, f1, f2
+    return f, omegas, x, t
