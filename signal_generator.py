@@ -34,7 +34,8 @@ class SignalGenerator:
         make_signal(self, which="all", add_noise=True, noise_std=0.25):
             Combines the signal components based on the specified type.
             Args:
-                which (str): Type of signal to generate ("all", "slow", "med", "fast").
+                which (str): Type of signal to generate ("all", "slow", "med",
+                    "fast", "slow_med", "med_fast", "slow_fast").
                 add_noise (bool): If True, adds Gaussian noise to the signal.
                 noise_std (float): Standard deviation of the Gaussian noise.
             Raises:
@@ -106,6 +107,12 @@ class SignalGenerator:
             self.f = self.f1_med + self.f2_med
         elif which == "fast":
             self.f = self.f1_fast + self.f2_fast
+        elif which == "slow_med":
+            self.f = self.f1_slow + self.f2_slow + self.f1_med + self.f2_med
+        elif which == "med_fast":
+            self.f = self.f1_med + self.f2_med + self.f1_fast + self.f2_fast
+        elif which == "slow_fast":
+            self.f = self.f1_slow + self.f2_slow + self.f1_fast + self.f2_fast
         else:
             raise ValueError("Unknown signal type")
 
