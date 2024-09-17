@@ -28,18 +28,17 @@ class SignalGenerator:
         f2_med (ndarray): Second medium varying component.
         f1_fast (ndarray): First fast varying component.
         f2_fast (ndarray): Second fast varying component.
-        f (ndarray): Combined signal. Computed using make_signal method.
+        f (ndarray): Combined signal, initialized as zeros.
+            Update using add_signal method, and add noise using add_noise method.
 
     Methods:
-        make_signal(self, which="all", add_noise=True, noise_std=0.25):
-            Combines the signal components based on the specified type.
+        add_signal: Adds the specified signal type to the combined signal.
             Args:
-                which (str): Type of signal to generate ("all", "slow", "med",
-                    "fast", "slow_med", "med_fast", "slow_fast").
-                add_noise (bool): If True, adds Gaussian noise to the signal.
-                noise_std (float): Standard deviation of the Gaussian noise.
-            Raises:
-                ValueError: If an unknown signal type is specified.
+                which (str): Signal type to add. Options are "slow", "med", "fast" and "all".
+        add_noise: Adds Gaussian noise to the combined signal.
+            Args:
+                noise_std (float): Standard deviation of the Gaussian noise. Default is 0.25.
+                random_seed (int): Random seed for reproducibility. Default is None.
     """
     def __init__(
             self,
@@ -73,6 +72,7 @@ class SignalGenerator:
         self.f2_med = self._f2med(self.X, self.T, self.omega_f2med)
         self.f1_fast = self._f1fast(self.X, self.T, self.omega_f1fast)
         self.f2_fast = self._f2fast(self.X, self.T, self.omega_f2fast)
+        self.f = np.zeros(self.f1_slow.shape)
 
     def _f1slow(self, x, t, omega):
         f = np.cos(2*np.pi*x/(2*self.x_length)) * np.cos(omega*t)
@@ -98,23 +98,18 @@ class SignalGenerator:
         f = x*x*np.exp(-(x + 1)*(x+1)) * np.cos(omega*t+np.pi/4)
         return f
 
-    def make_signal(self, which="all", add_noise=True, noise_std=0.25):
-        if which == "all":
-            self.f = self.f1_slow + self.f2_slow + self.f1_med + self.f2_med + self.f1_fast + self.f2_fast
-        elif which == "slow":
-            self.f = self.f1_slow + self.f2_slow
+    def add_signal(self, which):
+        if which == "slow":
+            self.f += self.f1_slow + self.f2_slow
         elif which == "med":
-            self.f = self.f1_med + self.f2_med
+            self.f += self.f1_med + self.f2_med
         elif which == "fast":
-            self.f = self.f1_fast + self.f2_fast
-        elif which == "slow_med":
-            self.f = self.f1_slow + self.f2_slow + self.f1_med + self.f2_med
-        elif which == "med_fast":
-            self.f = self.f1_med + self.f2_med + self.f1_fast + self.f2_fast
-        elif which == "slow_fast":
-            self.f = self.f1_slow + self.f2_slow + self.f1_fast + self.f2_fast
+            self.f += self.f1_fast + self.f2_fast
+        elif which == "all":
+            self.f += self.f1_slow + self.f2_slow + self.f1_med + self.f2_med + self.f1_fast + self.f2_fast
         else:
             raise ValueError("Unknown signal type")
 
-        if add_noise:
-            self.f += np.random.normal(0, noise_std, self.f.shape)
+    def add_noise(self, noise_std=0.25, random_seed=None):
+        np.random.seed(random_seed)
+        self.f += np.random.normal(0, noise_std, self.f.shape)
