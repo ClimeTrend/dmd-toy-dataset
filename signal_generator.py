@@ -20,19 +20,25 @@ class SignalGenerator:
 
     def add_sinusoid1(self, a=1, k=0.1, omega=1, gamma=0):
         signal = a * np.sin(k*self.X - omega*self.T)*np.exp(gamma*self.T)
-        my_dict = {'a': a, 'k': k, 'omega': omega, 'gamma': gamma, 'signal': signal}
+        my_dict = {'type': 'sinusoid1', 'a': a, 'k': k, 'omega': omega, 'gamma': gamma, 'signal': signal}
         self.components.append(my_dict)
         self.signal += signal
 
     def add_sinusoid2(self, a=1, omega=1):
         signal = a * np.exp(-0.2*self.X*self.X) * np.cos(omega*self.T)
-        my_dict = {'a': a, 'omega': omega, 'signal': signal}
+        my_dict = {'type': 'sinusoid2', 'a': a, 'omega': omega, 'signal': signal}
         self.components.append(my_dict)
         self.signal += signal
 
     def add_sinusoid3(self, a=1, omega=1):
         signal = a * 1.0/np.cosh(0.5*(self.X + 2)) * np.cos(omega*self.T)
-        my_dict = {'a': a, 'omega': omega, 'signal': signal}
+        my_dict = {'type': 'sinusoid3', 'a': a, 'omega': omega, 'signal': signal}
+        self.components.append(my_dict)
+        self.signal += signal
+
+    def add_trend(self, mu=0.2, trend=0.01):
+        signal = self.T*trend + mu
+        my_dict = {'type': 'trend', 'mu': mu, 'trend': trend, 'signal': signal}
         self.components.append(my_dict)
         self.signal += signal
 
