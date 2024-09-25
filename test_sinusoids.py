@@ -1,3 +1,7 @@
+"""
+Script to test the SignalGenerator class.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from signal_generator import SignalGenerator
@@ -38,20 +42,35 @@ plt.ylabel('Space')
 plt.colorbar(contour)
 plt.title('Signal 2')
 
-# signal_generator.add_sinusoid3(omega=2.5)
-# plt.figure()
-# contour = plt.contourf(
-#     signal_generator.T,
-#     signal_generator.X,
-#     signal_generator.components[2]["signal"],
-#     levels=levels,
-#     cmap='bwr',
-#     extend='both'
-#     )
-# plt.xlabel('Time')
-# plt.ylabel('Space')
-# plt.colorbar(contour)
-# plt.title('Signal 3')
+signal_generator.add_sinusoid3(omega=2.5)
+plt.figure()
+contour = plt.contourf(
+    signal_generator.T,
+    signal_generator.X,
+    signal_generator.components[2]["signal"],
+    levels=levels,
+    cmap='bwr',
+    extend='both'
+    )
+plt.xlabel('Time')
+plt.ylabel('Space')
+plt.colorbar(contour)
+plt.title('Signal 3')
+
+signal_generator.add_trend(trend=0.005)
+plt.figure()
+contour = plt.contourf(
+    signal_generator.T,
+    signal_generator.X,
+    signal_generator.components[3]["signal"],
+    levels=np.arange(0.1, 0.55, 0.025),
+    cmap='viridis',
+    extend='both'
+    )
+plt.xlabel('Time')
+plt.ylabel('Space')
+plt.colorbar(contour)
+plt.title('Trend')
 
 signal_generator.add_noise(random_seed=42)
 plt.figure()
