@@ -45,3 +45,31 @@ class SignalGenerator:
     def add_noise(self, noise_std=0.1, random_seed=None):
         np.random.seed(random_seed)
         self.signal += np.random.normal(0, noise_std, self.signal.shape)
+
+
+def sample_data(data, t, dt=1, duration=None):
+    """
+    Given an input spatio-temporal dataset,
+    sample the data at a given temporal rate.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Input spatio-temporal data with shape (time, space)
+    t : np.ndarray
+        Corresponding time vector with shape (time,)
+    dt : int, optional
+        Temporal sampling rate, i.e. how many time steps to skip.
+        By default, 1.
+    duration : int, optional
+        Number of time steps to sample. If None, sample the entire dataset.
+        By default, None.
+    """
+    if duration is None:
+        duration = data.shape[0]
+
+    # Sample the data
+    data_sampled = data[:duration:dt]
+    t_sampled = t[:duration:dt]
+
+    return data_sampled, t_sampled
