@@ -19,14 +19,47 @@ class SignalGenerator:
         self.components = []
 
     def add_sinusoid1(self, a=1, k=0.1, omega=1, gamma=0):
-        signal = a * np.sin(k*self.X - omega*self.T)*np.exp(gamma*self.T)
+        """
+        Generate a sinusoidal signal of the form: a*sin(k*x - omega*t)*exp(gamma*t)
+
+        Parameters
+        ----------
+        a : float, optional
+            Amplitude of the sinusoidal signal, by default 1
+        k : float, optional
+            Spatial frequency of the signal, by default 0.1
+        omega : float, optional
+            Temporal frequency of the signal, by default 1
+        gamma : float, optional
+            Temporal decay rate of the signal, by default 0
+        """
+        signal = np.sin(k*self.X - omega*self.T)*np.exp(gamma*self.T)
+        spatial_norm = np.linalg.norm(signal, axis=-1, ord=2)
+        signal = signal / spatial_norm[:, None]
+        signal = a * signal
         my_dict = {'type': 'sinusoid1', 'a': a, 'k': k, 'omega': omega, 'gamma': gamma, 'signal': signal}
         self.components.append(my_dict)
         self.signal += signal
 
-    def add_sinusoid2(self, a=1, omega=1):
-        signal = a * np.exp(-0.2*self.X*self.X) * np.cos(omega*self.T)
-        my_dict = {'type': 'sinusoid2', 'a': a, 'omega': omega, 'signal': signal}
+    def add_sinusoid2(self, a=1, k=0.2, omega=1, c=0):
+        """
+        Generate a sinusoidal signal of the form: a*(exp(-k*x^2)+c)*cos(omega*t)
+
+        Parameters
+        ----------
+        a : float, optional
+            Amplitude (area under the curve) of the signal, by default 1
+        k : float, optional
+            Spatial exponential decay rate of the signal, by default 0.2
+        omega : float, optional
+            Temporal frequency of the signal, by default 1
+        c : float, optional
+            Offset of the signal, by default 0
+        """
+        spatial_signal = np.exp(-k*self.X*self.X)
+        area = np.trapz(spatial_signal, self.x, axis=-1)[0]  # Compute the area under the curve
+        signal = a * (spatial_signal / area + c) * np.cos(omega*self.T)
+        my_dict = {'type': 'sinusoid2', 'a': a, 'k': k, 'omega': omega, 'c': c, 'signal': signal}
         self.components.append(my_dict)
         self.signal += signal
 
