@@ -43,7 +43,7 @@ class SignalGenerator:
 
     def add_sinusoid2(self, a=1, k=0.2, omega=1, c=0):
         """
-        Generate a sinusoidal signal of the form: a*(exp(-k*x^2)+c)*cos(omega*t)
+        Generate a sinusoidal signal of the form: a*(exp(-k*(x+c)^2)*cos(omega*t)
 
         Parameters
         ----------
@@ -56,9 +56,9 @@ class SignalGenerator:
         c : float, optional
             Offset of the signal, by default 0
         """
-        spatial_signal = np.exp(-k*self.X*self.X)
+        spatial_signal = np.exp(-k*(self.X+c)**2)
         area = np.trapz(spatial_signal, self.x, axis=-1)[0]  # Compute the area under the curve
-        signal = a * (spatial_signal / area + c) * np.cos(omega*self.T)
+        signal = a * spatial_signal / area * np.cos(omega*self.T)
         my_dict = {'type': 'sinusoid2', 'a': a, 'k': k, 'omega': omega, 'c': c, 'signal': signal}
         self.components.append(my_dict)
         self.signal += signal
