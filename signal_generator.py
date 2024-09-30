@@ -97,12 +97,19 @@ def sample_data(data, t, dt=1, duration=None):
     duration : int, optional
         Number of time steps to sample. If None, sample the entire dataset.
         By default, None.
+
+    Returns
+    -------
+    np.ndarray
+        Sampled data with shape (time, space)
+    np.ndarray
+        Corresponding sampled time vector with shape (time,)
     """
     if duration is None:
         duration = data.shape[0]
 
     # Sample the data
-    data_sampled = data[:duration:dt]
-    t_sampled = t[:duration:dt]
+    data_sampled = data[-duration::dt]
+    t_sampled = t[-duration::dt]
 
     return data_sampled, t_sampled
