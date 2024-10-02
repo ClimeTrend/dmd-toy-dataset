@@ -63,12 +63,6 @@ class SignalGenerator:
         self.components.append(my_dict)
         self.signal += signal
 
-    def add_sinusoid3(self, a=1, omega=1):
-        signal = a * 1.0/np.cosh(0.5*(self.X + 2)) * np.cos(omega*self.T)
-        my_dict = {'type': 'sinusoid3', 'a': a, 'omega': omega, 'signal': signal}
-        self.components.append(my_dict)
-        self.signal += signal
-
     def add_trend(self, mu=0.2, trend=0.01):
         signal = self.T*trend + mu
         my_dict = {'type': 'trend', 'mu': mu, 'trend': trend, 'signal': signal}
